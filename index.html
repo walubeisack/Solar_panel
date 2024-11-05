@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Intro to MapView - Create a 2D map | Sample | ArcGIS Maps SDK for JavaScript 4.30</title>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.30/"></script>
+
+    <script>
+      require(["esri/Map", "esri/views/MapView","esri/layers/FeatureLayer", "esri/widgets/Legend", "esri/widgets/LayerList"], 
+        (Map, MapView, FeatureLayer, Legend,LayerList ) => {
+        const map = new Map({
+          basemap: "dark-gray"
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 11,
+          center: [-71.39, 41.83] // longitude, latitude
+        });
+
+
+
+        view.when(() => {
+            // get the first layer in the collection of operational layers in the WebMap
+            // when the resources in the MapView have loaded.
+                
+          const legend = new Legend({
+              view: view,
+              layerInfos: [
+                {
+                  layer: baseLayer,
+                  title: "Solar Panel"
+                }
+              ]
+            });
+
+          const layerList = new LayerList({
+                view: view
+              });
+
+              // Add widget to the bottom right corner of the view
+              view.ui.add(legend, "bottom-right");
+              view.ui.add(layerList, "top-right");
+          });
+
+      const colors = ["#d92b30", "#3cccb4", "#ffdf3c"];
+
+        const commonProperties = {
+          type: "simple-fill",
+          outline: {
+          width:0
+          }
+        };
+
+        const year2011 = {
+          ...commonProperties,
+          color: colors[0]
+        };
+
+        const year2012 = {
+          ...commonProperties,
+          color: colors[1]
+        };
+
+        const otheryr = {
+          ...commonProperties,
+          color: colors[2]
+        };
+
+        const yrRenderer = {
+          type: "unique-value", // autocasts as new UniqueValueRenderer()
+          legendOptions: {
+            title: "Built Year"
+          },
+          defaultSymbol: otheryr,
+          defaultLabel: "Other Year",
+          field: "year",
+
+          uniqueValueInfos: [
+            {
+              value: "2011", // code for year 2021
+              symbol: year2011,
+              label: "2011"
+            },
+          
+
+          ]};
+
+        const template = {title: "Solar Panel",
+        content: 
+            [{
+              // It is also possible to set the fieldInfos outside of the content
+              // directly in the popupTemplate. If no fieldInfos is specifically set
+              // in the content, it defaults to whatever may be set within the popupTemplate.
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "date_built",
+                  label: "Date Build"
+                },
+                {
+                  fieldName: "solar_area",
+                  label: "Solar Area"
+                },
+                ]
+
+        }]};
+
+        const baseLayer = new FeatureLayer({
+          portalItem: {
+            id: "a171604da3dc42b0befc156d8b23b9d5"
+          },
+          popupTemplate: template,
+          renderer:yrRenderer
+        });
+          
+          map.add(baseLayer)
+
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
